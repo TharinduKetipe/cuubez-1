@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 
 import com.cuubez.core.annotation.HttpMethod;
 import com.cuubez.core.annotation.context.MethodAnnotationMetaData;
+import com.cuubez.core.annotation.context.ServiceAnnotationClasses;
 import com.cuubez.core.annotation.context.ServiceAnnotationMethodName;
 import com.cuubez.core.context.MediaType;
 import com.cuubez.core.context.ServiceContext;
@@ -59,16 +60,21 @@ public class MethodAnnotationScanner {
 
                 if (serviceRepository.getServiceAnnotationNames().contains(annotation.annotationType().getName())) {
 
-                    String serviceName, serviceLocation;
+                    String path;
                     HttpMethod httpMethod;
                     MediaType mediaType;
+                    boolean isSecure;
+                    String[] userIds;
+                    String[] roleIds; 
 
                     try {
 
-                        serviceName = (String) annotation.annotationType().getMethod(ServiceAnnotationMethodName.SERVICE_NAME.value()).invoke(annotation);
-                        serviceLocation = (String) annotation.annotationType().getMethod(ServiceAnnotationMethodName.SERVICE_PATH.value()).invoke(annotation);
+                        path = formatPath((String) annotation.annotationType().getMethod(ServiceAnnotationMethodName.SERVICE_PATH.value()).invoke(annotation));
                         httpMethod = (HttpMethod) annotation.annotationType().getMethod(ServiceAnnotationMethodName.HTTP_METHOD.value()).invoke(annotation);
                         mediaType = (MediaType) annotation.annotationType().getMethod(ServiceAnnotationMethodName.MEDIA_TYPE.value()).invoke(annotation);
+                        isSecure = (Boolean)annotation.annotationType().getMethod(ServiceAnnotationMethodName.SECURE.value()).invoke(annotation);
+                        userIds = (String[])annotation.annotationType().getMethod(ServiceAnnotationMethodName.USER_IDS.value()).invoke(annotation);
+                        roleIds = (String[])annotation.annotationType().getMethod(ServiceAnnotationMethodName.ROLE_IDS.value()).invoke(annotation);
 
                         String annotationName = annotation.annotationType().getCanonicalName();
                         String packageName = annotation.annotationType().getPackage().getName();
@@ -78,10 +84,21 @@ public class MethodAnnotationScanner {
                         ServiceContext serviceContext = new ServiceContext();
                         serviceContext.setPackageName(packageName);
                         serviceContext.setServiceClass(serviceClass);
-                        serviceContext.setServiceName(serviceName);
                         serviceContext.setMediaType(mediaType);
+                        serviceContext.setSecure(isSecure);
+                        serviceContext.setUserIds(userIds);
+                        serviceContext.setRoleIds(roleIds);
 
-                        MethodAnnotationMetaData methodAnnotationMetaData = serviceContext.addServiceAnnotationMetaData(annotationName, serviceLocation)
+                        if(annotation.annotationType().getName().equals(ServiceAnnotationClasses.ENCRYPTED_REST_SERVICE.serviceName())) {
+                          serviceContext.setEncrypt(true);
+                        }
+
+
+                        if(annotation.annotationType().getName().equals(ServiceAnnotationClasses.SIGN_REST_SERVICE.serviceName())) {
+                          serviceContext.setSign(true);
+                        }
+
+                        MethodAnnotationMetaData methodAnnotationMetaData = serviceContext.addServiceAnnotationMetaData(annotationName, path)
                                 .addMethodAnnotationMetaData(methodName, methodReturnType);
 
                         if (method.getParameterTypes() != null && method.getParameterTypes().length > 0) {
@@ -97,7 +114,7 @@ public class MethodAnnotationScanner {
                             }
                         }
 
-                        serviceRepository.addService(httpMethod.name(), serviceLocation, serviceName, serviceContext);
+                        serviceRepository.addService(httpMethod.name(), path, serviceContext);
                         break; //Only one service annotation is allow for one method
 
 
@@ -123,5 +140,24 @@ public class MethodAnnotationScanner {
 
     }
 
+
+    private String formatPath(String path) {
+
+        if (path.equals("/")) {
+            return path;
+        }
+
+        if (path.lastIndexOf("/") == path.length() - 1) {
+
+            path = path.substring(0, path.length() - 1);
+
+        }
+
+        if(path.startsWith("/")) {
+            path = path.substring(1, path.length());
+        }
+
+        return path;
+    }
 
 }

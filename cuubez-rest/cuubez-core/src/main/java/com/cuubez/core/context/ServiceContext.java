@@ -22,6 +22,11 @@ public class ServiceContext {
     private Class<?> serviceClass = null;
     private String serviceName = null;
     private MediaType mediaType = null;
+    private boolean sign = false;
+    private boolean encrypt = false;
+    private boolean isSecure = false;
+    private String[] userIds = null;
+    private String[] roleIds = null;
     private ServiceAnnotationMetaData serviceAnnotationMetaData = null;
 
 
@@ -61,9 +66,47 @@ public class ServiceContext {
         return serviceAnnotationMetaData;
     }
 
-    public ServiceAnnotationMetaData addServiceAnnotationMetaData(String annotationName, String serviceLocation) {
-        return this.serviceAnnotationMetaData = new ServiceAnnotationMetaData(annotationName, serviceLocation);
+    public ServiceAnnotationMetaData addServiceAnnotationMetaData(String annotationName, String path) {
+        return this.serviceAnnotationMetaData = new ServiceAnnotationMetaData(annotationName, path);
     }
 
+	public boolean isSecure() {
+		return isSecure;
+	}
 
+	public void setSecure(boolean isSecure) {
+		this.isSecure = isSecure;
+	}
+
+    public String[] getUserIds() {
+		return userIds;
+	}
+
+	public void setUserIds(String[] userIds) {
+		this.userIds = userIds;
+	}
+
+	public String[] getRoleIds() {
+		return roleIds;
+	}
+
+	public void setRoleIds(String[] roleIds) {
+		this.roleIds = roleIds;
+	}
+
+    public boolean isEncrypt() {
+        return encrypt;
+    }
+
+    public void setEncrypt(boolean encrypt) {
+        this.encrypt = encrypt;
+    }
+
+    public boolean isSign() {
+        return sign;
+    }
+
+    public void setSign(boolean sign) {
+        this.sign = sign;
+    }
 }
