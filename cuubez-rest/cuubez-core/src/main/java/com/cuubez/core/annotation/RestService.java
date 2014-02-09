@@ -25,12 +25,16 @@ import com.cuubez.core.context.MediaType;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RestService {
 
-    String name();
-
-    String path();
+    String path()  default "/";
 
     HttpMethod httpMethod();
 
     MediaType mediaType();
+    
+    boolean isSecure() default false;
+    
+    String[] userIds() default "[undefined]";
+    
+    String[] roleIds() default "[undefined]";
 
 }

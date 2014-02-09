@@ -18,7 +18,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
+import com.cuubez.core.annotation.context.FieldAnnotationClasses;
 import com.cuubez.core.annotation.context.FieldAnnotationMetaData;
+import com.cuubez.core.annotation.context.ServiceAnnotationClasses;
 import com.cuubez.core.annotation.context.ServiceAnnotationMethodName;
 import com.cuubez.core.context.FieldContext;
 import com.cuubez.core.context.ServiceRepository;
@@ -30,15 +32,14 @@ public class FieldAnnotationScanner {
 
         Class<?> fieldType = null;
         String fieldName = null, annotationName = null, assignedFieldName = null;
-
         Field[] fields = clazz.getDeclaredFields();
         FieldAnnotationMetaData fieldAnnotationMetaData = new FieldAnnotationMetaData();
+        boolean isEncryptField = false;
 
         for (Field field : fields) {
 
-            fieldName = null;
             annotationName = null;
-            fieldType = null;
+            isEncryptField = false;
             assignedFieldName = null;
 
             if (field.getDeclaredAnnotations() != null && field.getDeclaredAnnotations().length > 0) {
@@ -50,6 +51,11 @@ public class FieldAnnotationScanner {
                     try {
 
                         assignedFieldName = (String) annotation.annotationType().getMethod(ServiceAnnotationMethodName.PARAMETER_NAME.value()).invoke(annotation);
+
+                        if(annotation.annotationType().getName().equals(FieldAnnotationClasses.ENCRYPT_FIELD.fieldName())) {
+                            isEncryptField = true;
+                        }
+
 
                     } catch (IllegalArgumentException e) {
                         throw new CuubezException(e, CuubezException.INTERNAL_EXCEPTION);
@@ -72,10 +78,11 @@ public class FieldAnnotationScanner {
             fieldName = field.getName();
             fieldType = field.getType();
 
-            fieldAnnotationMetaData.addFieldMetaData(fieldName, assignedFieldName, annotationName, fieldType);
-            FieldContext fieldContext = new FieldContext(fieldAnnotationMetaData);
-            serviceRepository.addFieldDetails(clazz.getName(), fieldContext);
+            fieldAnnotationMetaData.addFieldMetaData(fieldName, assignedFieldName, annotationName, fieldType, isEncryptField);
+
         }
+        FieldContext fieldContext = new FieldContext(fieldAnnotationMetaData);
+        serviceRepository.addFieldDetails(clazz.getName(), fieldContext);
 
     }
 

@@ -23,12 +23,19 @@ import com.cuubez.core.engine.parser.content.xml.XMLExceptionParser;
 import com.cuubez.core.engine.parser.url.URLParser;
 import com.cuubez.core.engine.parser.url.xml.XMLParameterParser;
 import com.cuubez.core.engine.parser.url.xml.XMLURLParser;
+import com.cuubez.core.exception.CuubezExceptionConstance;
+import com.cuubez.core.security.process.SecurityProcessor;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 public class ParserFactory {
 
-    public void parse(ConfigurationContext configurationContext, MediaType mediaType, int parserType) throws CuubezException {
+    private static Log log = LogFactory.getLog(ParserFactory.class);
 
-        if (MediaType.XML.equals(mediaType)) {
+    public void parse(ConfigurationContext configurationContext, int parserType) throws CuubezException {
+
+        if (MediaType.XML.equals(configurationContext.getUrlContext().getMediaType())) {
 
             if (parserType == Parser.CONTENT) {
 
@@ -49,6 +56,19 @@ public class ParserFactory {
 
                 ContentParser parser = new XMLExceptionParser();
                 parser.parse(configurationContext);
+
+            } else if(parserType == Parser.SECURITY) {
+
+                SecurityProcessor securityProcessor = new SecurityProcessor();
+
+                try {
+
+                    securityProcessor.process(configurationContext);
+
+                }catch (Exception e) {
+                    log.error("Exception occur while trying to process security");
+                    throw new CuubezException(e, CuubezExceptionConstance.INTERNAL_EXCEPTION);
+                }
             }
 
         }

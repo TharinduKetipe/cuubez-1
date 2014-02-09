@@ -28,6 +28,11 @@ public class RequestContext {
 	private HttpMethod httpMethod;
 	private HttpURLConnection httpURLConnection;
 	private Object[] parameters;
+	private String principal;
+	private String credentials;
+	private int keyExAlgoName;
+	private byte[] publicKey;
+	private byte[] publicKey2;
 	private String transformedParameter;
 	private Document document;
 	
@@ -93,6 +98,76 @@ public class RequestContext {
 
 	public void setDocument(Document document) {
 		this.document = document;
+	}
+
+    /**
+     * @return the principal
+     */
+    public String getPrincipal() {
+        return principal;
+    }
+
+    /**
+     * @param principal the principal to set
+     */
+    public void setPrincipal(String principal) {
+        this.principal = principal;
+    }
+
+    /**
+     * @return the credentials
+     */
+    public String getCredentials() {
+        return credentials;
+    }
+
+    /**
+     * @param credentials the credentials to set
+     */
+    public void setCredentials(String credentials) {
+        this.credentials = credentials;
+    }
+
+	/**
+	 * @return the keyExAlgoName
+	 */
+	public int getKeyExAlgoName() {
+		return keyExAlgoName;
+	}
+
+	/**
+	 * @param keyExAlgoName the keyExAlgoName to set
+	 */
+	public void setKeyExAlgoName(int keyExAlgoName) {
+		this.keyExAlgoName = keyExAlgoName;
+	}
+
+	/**
+	 * @return the publicKey
+	 */
+	public byte[] getPublicKey() {
+		return publicKey;
+	}
+
+	/**
+	 * @param publicKey the publicKey to set
+	 */
+	public void setPublicKey(byte[] publicKey) {
+		this.publicKey = publicKey;
+	}
+
+	/**
+	 * @return the publicKey2
+	 */
+	public byte[] getPublicKey2() {
+		return publicKey2;
+	}
+
+	/**
+	 * @param publicKey2 the publicKey2 to set
+	 */
+	public void setPublicKey2(byte[] publicKey2) {
+		this.publicKey2 = publicKey2;
 	}
 
 	
